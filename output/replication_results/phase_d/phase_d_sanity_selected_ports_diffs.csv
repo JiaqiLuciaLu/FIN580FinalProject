@@ -1,0 +1,3 @@
+file,py_shape,r_shape,cols_match,max_abs_diff
+Selected_Ports_10.csv,636x10,636x10,True,0.0
+Selected_Ports_Weights_10.csv,10,10,True,2.2765123119938835e-11

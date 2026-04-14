@@ -1,0 +1,188 @@
+---
+title: "Forest Through the Trees: Main Program Demo"
+output: html_notebook
+---
+
+This demo code has been tested with R (version 4.3.2) + RStudio (version 2023.09.1+494) under two environments:
+
+1) 2020 Macbook Pro, M1 CPU (8 cores), 16GB memory, macOS 14.1.1, 
+2) Windows Desktop, Intel i9-10850K (10 cores), 32GB memory, Windows 11 Pro
+
+This simplified demo code (without full parameter grid-search) takes roughly 20 mins to run with CPU parallel computing with 6 cores on both machines
+
+Package versions:
+
+*rstudioapi: 0.15.0*
+
+*lars: 1.3*
+
+*ggplot2: 3.4.4*
+
+*dplyr: 1.1.4*
+
+*doSNOW: 1.0.20*
+
+*foreach: 1.5.2*
+
+---
+
+## Preparation and Environment Setup
+
+The following code block installs the required packages if not already installed:
+```{r}
+list.of.packages <- c("rstudioapi","lars","ggplot2","dplyr","doSNOW","foreach","tictoc")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+library(tictoc)
+```
+
+Set up working directory, please make sure the working directory is set within the "Code" folder for this demo to run correctly
+```{r}
+rm(list = ls())
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+```
+
+Set up basic parameters, in this demo we focus on one cross-section of Size (LME), Operating Profitability (OP), and Investment (Investment)
+```{r}
+feats_list = c('LME','BEME','r12_2','OP','Investment','ST_Rev','LT_Rev','AC','IdioVol',"LTurnover")
+feat1 = 4 # Operating Prof
+feat2 = 5 # Investment
+y_min = 1964
+y_max = 2016
+n_train_valid = 360 # n months for training and validation
+cvN = 3 #cross-validation counts
+
+portN=10
+
+# Change this to FALSE for max compatibility
+RunParallel = TRUE
+pralleln = 6
+# RunParallel = FALSE
+# pralleln = 1
+```
+
+Set up the path and create folders for intermediate outputs
+```{r}
+raw_data_path = '../Data/ret_characteristics/'
+data_chunk_path = '../Data/data_chunk_files_quantile/'
+tree_portfolio_path = '../Data/tree_portfolio_quantile/'
+tree_grid_search_path = '../Data/TreeGridSearch/'
+factor_path = '../Data/factor/'
+plot_path = '../Data/plot/'
+dir.create(data_chunk_path, showWarnings = FALSE)
+dir.create(tree_portfolio_path)
+dir.create(tree_grid_search_path)
+```
+
+## Portfolio Generation from Raw Data
+
+This is the code used to convert RAW data downloaded from CRSP/Compustat to Yearly files with only return, size (for value weighting), and corresponding quantile characteristics To comply with data sharing license from WRDS, we do not share this raw data but only share the outputs from this step, note that we have also added random noise to return and size so this data is only for illustration purpose
+
+
+```{r}
+source('1_Portfolio_Creation/Tree_Portfolio_Creation/Step1_Combine_Raw_Chars_Convert_Quantile_Split_Yearly_Chunks.R')
+# sample function interface:
+# create_yearly_chunks(y_min,y_max,feats_list,feat1,feat2,input_path,output_path,add_noise=FALSE)
+
+# comment out as RAW characteristics data is not included
+# create_yearly_chunks(y_min,y_max,feats_list,feat1,feat2,raw_data_path,data_chunk_path,TRUE)
+```
+
+Steps to generate the basis tree portfolios, this can take more than 1 hour on the M1 Macbook Pro when running sequentially, but takes 15 mins when running with paralleln=6
+
+```{r}
+tic()
+source('1_Portfolio_Creation/Tree_Portfolio_Creation/Step2_Generate_Tree_Portfolios_All_Levels_Char_Minmax.R')
+tree_depth = 4
+# sample function interface:
+# create_tree_portfolio(y_min,y_max,tree_depth,feats_list,feat1,feat2,input_path,output_path,runparallel,pralleln)
+
+create_tree_portfolio(y_min,y_max,tree_depth,feats_list,feat1,feat2,data_chunk_path,tree_portfolio_path,RunParallel,pralleln)
+toc()
+```
+
+
+Steps to remove risk-free rate from base portfolios to get excess returns, combine tree portfolios into single file, and filter portfolios sorted only based on a single characteristics
+```{r}
+tic()
+source('1_Portfolio_Creation/Tree_Portfolio_Creation/Step3_RmRf_Combine_Trees.R')
+# sample function interface:
+# combinetrees(feats_list, feat1, feat2, tree_depth, factor_path, tree_sort_path_base)
+combinetrees(feats_list, feat1, feat2, tree_depth, factor_path, tree_portfolio_path)
+
+source('1_Portfolio_Creation/Tree_Portfolio_Creation/Step4_Filter_SingleSorted_Tree_Ports.R')
+# sample function interface:
+# filterTreePorts(feats_list, feat1,feat2,tree_portfolio_path)
+filterTreePorts(feats_list,feat1,feat2,tree_portfolio_path)
+toc()
+```
+
+
+## AP Pruning on Base Portfolios with Grid Search
+
+
+In the paper we used a much larger grid search on the following parameter, but doing the full parameter search can take a long time to finish
+# lambda0 = seq(0, 0.9, 0.05)
+# lambda2 = 0.1^seq(5, 8, 0.25)
+
+For demonstration, we put the below parameters not a full grid search
+```{r}
+tic()
+lambda0 = seq(0.15, 0.15, 0.05)
+lambda2 = 0.1^seq(8, 8, 0.25)
+
+source('2_AP_Pruning/AP_Pruning.R')
+# sample function interface:
+# AP_Pruning(feats_list, feat1, feat2, input_path,input_file_name, output_path,n_train_valid,cvN,runFullCV,kmax, RunParallel, ParallelN,IsTree,lambda0, lambda2)
+# Due to dimension of trees, the grid search on trees can take a while without parallel computing
+AP_Pruning(feats_list, feat1, feat2, tree_portfolio_path,'/level_all_excess_combined_filtered.csv',tree_grid_search_path,n_train_valid,cvN,FALSE,50, RunParallel, pralleln, TRUE,lambda0, lambda2)
+toc()
+```
+
+
+
+## Parameter Search and Asset Pricing Regression Tests
+
+Grid Search on Lambda tuning parameters to pick the best parameter based on validation SR
+```{r}
+tic()
+source('3_Metrics_Collection/Pick_Best_Lambda.R')
+# sample function interface:
+# pickBestLambda(feats_list, feat1, feat2, ap_prune_result_path,portN,lambda0,lambda2, portfolio_path, port_name, fullCV=FALSE, writetable=TRUE)
+sharperatios = pickBestLambda(feats_list, feat1, feat2, tree_grid_search_path,portN,lambda0,lambda2, tree_portfolio_path,'/level_all_excess_combined_filtered.csv')
+toc()
+```
+
+
+Time Series Regression tests wrt factors
+The results are collected to form table 1 and 2, re-run this on the sample where we remove small cap stocks gives table 3
+
+```{r}
+tic()
+source('3_Metrics_Collection/SDF_TimeSeries_Regressions.R')
+# sample function interface:
+# SDF_regression(feats_list, feat1, feat2, factor_path, port_path, port_name,weight_name)
+regressionresults = SDF_regression(feats_list, feat1, feat2, factor_path, tree_grid_search_path, '/Selected_Ports_10.csv','/Selected_Ports_Weights_10.csv')
+toc()
+```
+
+---
+Report the SDF Sharpe ratios, given the noise added to the raw data and based only on one set of parameter without grid search, we are getting 0.589 monthly OOS SR
+
+```{r}
+print(paste("Training SR:", round(sharperatios[1],4), "    Validation SR:", round(sharperatios[2],4), "    Testing SR:", round(sharperatios[3],4),sep=""))
+```
+
+
+Generated SDF Portfolio is tested against various factors and the T-Statistics and corresponding p-values are reported
+
+```{r}
+print("SDF Regression results:")
+print(regressionresults)
+```
+
+
+
+
+
+
