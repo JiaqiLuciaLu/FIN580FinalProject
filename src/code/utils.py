@@ -8,7 +8,7 @@ import os
 # ----------------------------------------------------------------------
 # Paths
 # ----------------------------------------------------------------------
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Shared data lives on scratch for collaborator access
 DATA_ROOT = "/scratch/network/jl6134/COLLAB/FIN580/data"

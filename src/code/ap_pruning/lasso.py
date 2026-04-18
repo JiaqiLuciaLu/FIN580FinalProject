@@ -11,7 +11,7 @@ Mirrors `reference_code/2_AP_Pruning/lasso.R`:
     subset = K >= kmin & K <= kmax
     return list(beta[subset,], K[subset])
 
-Appending sqrt(λ₂)·I to X and zero-padding y converts an L1+L2 problem
+Appending sqrt(lambda2)*I to X and zero-padding y converts an L1+L2 problem
 to a pure L1 problem solvable by LARS. Uses sklearn's `lars_path`.
 """
 
@@ -22,8 +22,8 @@ from sklearn.linear_model import lars_path
 def lasso_en(X, y, lambda2, kmin=5, kmax=50):
     """
     Return (betas, K) where
-        betas: array of shape (n_kept_steps, p) — LARS-path coefficients
-        K:     array of shape (n_kept_steps,)   — nonzero count per step
+        betas: array of shape (n_kept_steps, p) -- LARS-path coefficients
+        K:     array of shape (n_kept_steps,)   -- nonzero count per step
 
     Only steps with K in [kmin, kmax] are retained, matching lasso.R.
     """

@@ -21,24 +21,41 @@ Installed: numpy, pandas, scipy, scikit-learn, statsmodels, matplotlib, seaborn,
 
 ## Architecture
 
-Code lives in `src/` as separate modules mirroring the paper's pipeline. Shared data lives at `/scratch/network/jl6134/COLLAB/FIN580/data/raw/` (not in git).
+Everything lives under `src/`, mirroring the R reference pipeline. Shared data lives at `/scratch/network/jl6134/COLLAB/FIN580/data/raw/` (not in git).
 
-- **`utils.py`** — paths (`DATA_RAW`, `TREE_GRID_DIR`, `PY_TREE_GRID_DIR`), constants (`FEATS_LIST`, `FEAT1=4`, `FEAT2=5`, `N_TRAIN_VALID=360`, `CV_N=3`, `KMIN=5`, `KMAX=50`), subdirectory helpers.
-- **`data_prep.py`** — `load_factors()`, `load_rf()`, `load_filtered_tree_portfolios()`, `extract_depths()`.
-- **`lasso.py`** — `lasso_en(X, y, λ₂, kmin, kmax)`: LARS-EN path via augmented-matrix trick on `sklearn.linear_model.lars_path`. Mirrors R's `lars.R`.
-- **`pruning.py`** — `ap_pruning(...)`: eigendecomp of Σ, σ̃/μ̃, LARS-EN per (λ₀, λ₂), writes `results_{cv_k,full}_l0_i_l2_j.csv`. Mirrors `AP_Pruning.R` + `lasso_valid_par_full.R`. Supports `n_workers` via `multiprocessing.Pool`.
-- **`metrics.py`** — `pick_best_lambda(...)`, `pick_sr_n(...)`: reads grid CSVs, builds SR heatmaps, writes `Selected_Ports_K.csv`, `Selected_Ports_Weights_K.csv`, `SR_N.csv`. Mirrors `Pick_Best_Lambda.R` + `SR_N.R`.
-- **`regressions.py`** — `sdf_regression(...)`, `ff_regression(...)`: FF3/FF5/XSF/FF11, writes `SDFTests/<subdir>/TimeSeriesAlpha.csv`. Mirrors `SDF_TimeSeries_Regressions.R`.
-- **`ap_trees.py`** — tree construction (R Steps 2–4). Deferred; data has pre-computed `level_all_excess_combined_filtered.csv`.
+```
+src/
+  code/
+    utils.py                       # shared paths, constants, helpers
+    portfolio_creation/
+      data_prep.py                 # load_factors(), load_rf(), load_filtered_tree_portfolios()
+    ap_pruning/
+      lasso.py                     # lasso_en() — LARS-EN via augmented-matrix trick
+      pruning.py                   # ap_pruning() — grid search over (λ₀, λ₂)
+    metrics/
+      metrics.py                   # pick_best_lambda(), pick_sr_n()
+      regressions.py               # sdf_regression(), ff_regression() — FF3/FF5/XSF/FF11
+    ablation/                      # (future: transformer encoder, alternative pruning)
+  notebooks/                       # end-to-end pipeline runners
+  reference_code/                  # original R implementation
+plots/                             # figure outputs
+output/                            # Python pipeline outputs (separate from R ground-truth)
+```
 
-Python outputs go under `output/` (kept separate from R ground-truth). Notebooks in `notebooks/` are end-to-end runners that also cross-validate against R.
+- **`src/code/utils.py`** — paths (`DATA_RAW`, `TREE_GRID_DIR`, `PY_TREE_GRID_DIR`), constants (`FEATS_LIST`, `FEAT1=4`, `FEAT2=5`, `N_TRAIN_VALID=360`, `CV_N=3`, `KMIN=5`, `KMAX=50`), subdirectory helpers.
+- **`src/code/portfolio_creation/data_prep.py`** — `load_factors()`, `load_rf()`, `load_filtered_tree_portfolios()`, `extract_depths()`. Mirrors R's `1_Portfolio_Creation/`.
+- **`src/code/ap_pruning/lasso.py`** — `lasso_en(X, y, λ₂, kmin, kmax)`: LARS-EN path via augmented-matrix trick on `sklearn.linear_model.lars_path`. Mirrors R's `lasso.R`.
+- **`src/code/ap_pruning/pruning.py`** — `ap_pruning(...)`: eigendecomp of Σ, σ̃/μ̃, LARS-EN per (λ₀, λ₂), writes `results_{cv_k,full}_l0_i_l2_j.csv`. Mirrors `AP_Pruning.R` + `lasso_valid_par_full.R`. Supports `n_workers` via `multiprocessing.Pool`.
+- **`src/code/metrics/metrics.py`** — `pick_best_lambda(...)`, `pick_sr_n(...)`: reads grid CSVs, builds SR heatmaps, writes `Selected_Ports_K.csv`, `Selected_Ports_Weights_K.csv`, `SR_N.csv`. Mirrors `Pick_Best_Lambda.R` + `SR_N.R`.
+- **`src/code/metrics/regressions.py`** — `sdf_regression(...)`, `ff_regression(...)`: FF3/FF5/XSF/FF11, writes `SDFTests/<subdir>/TimeSeriesAlpha.csv`. Mirrors `SDF_TimeSeries_Regressions.R`.
+- **`src/code/ablation/`** — placeholder for future extensions (transformer encoder for top-k selection, alternative pruning strategies).
 
 ### Running the pipelines
 
 ```bash
-PYTHONPATH=. python notebooks/run_phase_bc.py           # single-config (main_simplified.R)
-PYTHONPATH=. python notebooks/run_phase_d.py            # full grid (main.R)
-PYTHONPATH=. python notebooks/run_phase_d.py --skip-grid  # reuse 988 CSVs; rerun downstream only
+PYTHONPATH=. python src/notebooks/run_phase_bc.py           # single-config (main_simplified.R)
+PYTHONPATH=. python src/notebooks/run_phase_d.py            # full grid (main.R)
+PYTHONPATH=. python src/notebooks/run_phase_d.py --skip-grid  # reuse 988 CSVs; rerun downstream only
 ```
 
 ## Current Status

@@ -10,11 +10,11 @@ import os
 import numpy as np
 import pandas as pd
 
-from . import utils
+from src.code import utils
 
 
 def load_factors():
-    """Load `tradable_factors.csv` (636 months × 13 columns)."""
+    """Load `tradable_factors.csv` (636 months x 13 columns)."""
     path = os.path.join(utils.FACTOR_DIR, "tradable_factors.csv")
     df = pd.read_csv(path)
     return df
@@ -32,7 +32,7 @@ def load_rf():
 
 def load_filtered_tree_portfolios(subdir=utils.SUBDIR_3CHAR):
     """
-    Load `level_all_excess_combined_filtered.csv` — base portfolios for AP pruning.
+    Load `level_all_excess_combined_filtered.csv` -- base portfolios for AP pruning.
     Shape: (n_months=632, n_portfolios=~2200).
     Column names encode tree id + path; preserved as-is so we can parse depths.
     """
@@ -45,7 +45,7 @@ def load_filtered_tree_portfolios(subdir=utils.SUBDIR_3CHAR):
 
 def extract_depths(columns):
     """
-    Mirror of R's `depths = nchar(colnames(ports)) - 7` in AP_Pruning.R:5–32.
+    Mirror of R's `depths = nchar(colnames(ports)) - 7` in AP_Pruning.R:5-32.
 
     R column names look like 'X1111.111X' where the last 5 characters after the
     dot encode the tree path (5 chars -> depth 4 for the leaf, shorter for
