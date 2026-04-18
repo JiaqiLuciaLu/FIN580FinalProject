@@ -1,6 +1,6 @@
 """
-AP-Pruning: grid search over (λ₀, λ₂) computing per-sparsity Sharpe ratios
-on SDF portfolios constructed by LARS-EN on transformed (σ̃, μ̃) regression.
+AP-Pruning: grid search over (lambda0, lambda2) computing per-sparsity Sharpe ratios
+on SDF portfolios constructed by LARS-EN on transformed (sigma_tilde, mu_tilde) regression.
 
 Mirrors `reference_code/2_AP_Pruning/AP_Pruning.R` and
         `reference_code/2_AP_Pruning/lasso_valid_par_full.R`.
@@ -11,8 +11,8 @@ Pipeline (per R's main_simplified.R):
   - Split rows: train+valid = rows [0:360], test = [360:].
   - CV fold i holds out rows [(i-1)*120 : i*120]; runFullCV=False uses only
     fold cvN = 3. Always also run a 'full' fit on the full train+valid window.
-  - For each (λ₀, λ₂), eigendecompose Σ, build σ̃ and μ̃, run LARS-EN,
-    compute train/valid/test SRs per sparsity level, write a CSV.
+  - For each (lambda0, lambda2), eigendecompose Sigma, build sigma_tilde and mu_tilde,
+    run LARS-EN, compute train/valid/test SRs per sparsity level, write a CSV.
 """
 
 import os
@@ -48,7 +48,7 @@ def _process_config(task):
 
 def _rename_tree_cols(cols):
     """
-    Apply R's column-rename in AP_Pruning.R:13–16 exactly.
+    Apply R's column-rename in AP_Pruning.R:13-16 exactly.
 
     Example: 'X1111.11' -> '1.11'; 'X2333.12222' -> '2333.12222'; 'X1111.1' -> '.1'.
     """
@@ -69,9 +69,9 @@ def compute_adj_w(cols):
 
 def _build_sigma_tilde_mu_tilde(ports_train, lambda0):
     """
-    Mirror eigendecomp and construction in lasso_valid_par_full.R:35–48.
+    Mirror eigendecomp and construction in lasso_valid_par_full.R:35-48.
 
-    Returns σ̃ (p×p) and μ̃ (p,) for the given λ₀.
+    Returns sigma_tilde (p x p) and mu_tilde (p,) for the given lambda0.
     """
     mu = ports_train.mean(axis=0)
     sigma = np.cov(ports_train, rowvar=False)
@@ -84,7 +84,7 @@ def _build_sigma_tilde_mu_tilde(ports_train, lambda0):
     eigvals = eigvals[order]
     eigvecs = eigvecs[:, order]
 
-    # γ = min(min(T, N), sum(eigvals > 1e-10))
+    # gamma = min(min(T, N), sum(eigvals > 1e-10))
     gamma = min(min(ports_train.shape), int((eigvals > 1e-10).sum()))
     D = eigvals[:gamma]
     V = eigvecs[:, :gamma]
@@ -110,8 +110,8 @@ def _run_one_config(
 ):
     """
     Reproduce the inner loop body of lasso_cv_helper:
-      - Build σ̃, μ̃ for this λ₀.
-      - Run LARS-EN at this λ₂.
+      - Build sigma_tilde, mu_tilde for this lambda0.
+      - Run LARS-EN at this lambda2.
       - For each retained step: denormalize betas, normalize by |sum|,
         compute train/(valid)/test SDF Sharpe ratios.
 
@@ -142,7 +142,7 @@ def _run_one_config(
             continue
         b = b / s
 
-        # SDF = ports @ (b / adj_w) — ports here are the *scaled* adj_ports.
+        # SDF = ports @ (b / adj_w) -- ports here are the *scaled* adj_ports.
         sdf_train = ports_train @ (b / adj_w)
         sdf_test = ports_test @ (b / adj_w)
 
@@ -184,7 +184,7 @@ def ap_pruning(
     """
     Top-level entry point analogous to AP_Pruning() -> lasso_valid_full() in R.
 
-    `ports` is a DataFrame (T × N) with tree-encoded column names.
+    `ports` is a DataFrame (T x N) with tree-encoded column names.
     Writes one CSV per (cv_name, i, j) combination into `output_dir`:
         results_{cv_name}_l0_{i}_l2_{j}.csv
     with cv_name in {'cv_1', 'cv_2', 'cv_3', 'full'} (1-indexed for CVs).

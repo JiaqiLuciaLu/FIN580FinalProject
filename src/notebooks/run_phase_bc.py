@@ -13,7 +13,10 @@ import time
 import numpy as np
 import pandas as pd
 
-from src import data_prep, pruning, metrics, regressions, utils
+from src.code import utils
+from src.code.portfolio_creation import data_prep
+from src.code.ap_pruning import pruning
+from src.code.metrics import metrics, regressions
 
 
 REPLICATION_DIR = os.path.join(utils.OUTPUT_DIR, "replication_results")

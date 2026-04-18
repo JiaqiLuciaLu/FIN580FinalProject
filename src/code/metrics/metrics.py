@@ -1,5 +1,5 @@
 """
-Grid-search post-processing: pick best (λ₀, λ₂) on validation SR,
+Grid-search post-processing: pick best (lambda0, lambda2) on validation SR,
 extract selected portfolios and weights at a given sparsity level.
 
 Mirrors `reference_code/3_Metrics_Collection/Pick_Best_Lambda.R`.
@@ -115,7 +115,7 @@ def _load_sr_cache(result_dir, n0, n2, full_cv):
     Pre-load meta columns (portsN + SRs) from every grid CSV needed for SR_N.
 
     Returns a dict {(cv_name, i, j): DataFrame[portsN, train_SR, valid_SR, test_SR]}.
-    Reading each file *once* up front avoids the 46× redundant re-reads that
+    Reading each file *once* up front avoids the 46x redundant re-reads that
     pickSRN would otherwise issue (one pick_best_lambda call per K).
     """
     cache = {}
@@ -184,12 +184,12 @@ def pick_sr_n(
     full_cv=False,
 ):
     """
-    Port of pickSRN(...). Loops pick_best_lambda over K ∈ [kmin, kmax],
-    assembles a 3 × (kmax-kmin+1) matrix (rows: train/valid/test SR),
+    Port of pickSRN(...). Loops pick_best_lambda over K in [kmin, kmax],
+    assembles a 3 x (kmax-kmin+1) matrix (rows: train/valid/test SR),
     writes SR_N.csv to result_dir matching R's write.table format, and
     returns the matrix.
 
-    Uses a one-shot CSV cache (read each grid file once) — ~46× faster than
+    Uses a one-shot CSV cache (read each grid file once) -- ~46x faster than
     naively looping pick_best_lambda per K.
     """
     n0, n2 = len(lambda0_list), len(lambda2_list)
@@ -199,10 +199,10 @@ def pick_sr_n(
     for k in ks:
         tr, va, te = _pick_best_from_cache(cache, k, n0, n2, full_cv)
         cols.append([tr, va, te])
-    sr_mat = np.array(cols).T  # 3 × len(ks)
+    sr_mat = np.array(cols).T  # 3 x len(ks)
 
     # Match R's write.table(srN, ..., row.names=F) output exactly:
-    #   header: "srN","","","",...  (first is variable name, rest empty — all quoted)
+    #   header: "srN","","","",...  (first is variable name, rest empty -- all quoted)
     #   data:   unquoted numerics
     out_path = os.path.join(result_dir, "SR_N.csv")
     header_fields = ['"srN"'] + ['""'] * (len(ks) - 1)

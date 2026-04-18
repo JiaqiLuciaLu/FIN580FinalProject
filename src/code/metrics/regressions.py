@@ -25,11 +25,11 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 
-from . import utils
+from src.code import utils
 
 
 # Factor set column *indices into tradable_factors.csv* (0-indexed for Python).
-# These come straight from SDF_TimeSeries_Regressions.R:14–26.
+# These come straight from SDF_TimeSeries_Regressions.R:14-26.
 FF3_COLS = [1, 2, 3]          # Mkt-RF, LME, BEME
 FF5_COLS = [1, 2, 3, 5, 6]    # Mkt-RF, LME, BEME, Investment, r12_2  (R: [2,3,4,6,7])
 FF11_COLS = list(range(1, 12))  # Mkt-RF ... Lturnover  (R: 2:12)
@@ -57,7 +57,7 @@ def _xsf_cols(feat1=utils.FEAT1, feat2=utils.FEAT2, feats_list=utils.FEATS_LIST)
 def ff_regression(sdf, factor_mat, option):
     """
     Port of FF_regression(...). `factor_mat` is the test-period slice of
-    tradable_factors.csv (T × 13). `option` is either a list of column
+    tradable_factors.csv (T x 13). `option` is either a list of column
     indices (0-indexed) or one of 'FF3', 'FF5', 'FF11'.
 
     Returns (alpha, SE(alpha), t-stat, p-value).
@@ -81,7 +81,7 @@ def ff_regression(sdf, factor_mat, option):
 def compute_statistics(sdf, factor_mat, xsf_option):
     """
     Run FF3, FF5, XSF, FF11 regressions and return the 16-value vector
-    [α × 4, SE × 4, t-stat × 4, p-value × 4] in that order.
+    [alpha x 4, SE x 4, t-stat x 4, p-value x 4] in that order.
     """
     alpha = np.zeros(4)
     se = np.zeros(4)
