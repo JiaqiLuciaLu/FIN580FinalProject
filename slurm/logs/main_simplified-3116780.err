@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "/scratch/network/jl6134/COLLAB/FIN580/FIN580FinalProject/src/code/main_simplified.py", line 123, in <module>
+    main()
+  File "/scratch/network/jl6134/COLLAB/FIN580/FIN580FinalProject/src/code/main_simplified.py", line 69, in main
+    create_tree_portfolio(y_min, y_max, tree_depth, feats_list, feat1, feat2,
+  File "/scratch/network/jl6134/COLLAB/FIN580/FIN580FinalProject/src/code/portfolio_creation/tree_portfolio_creation/step2_generate_tree_portfolios_all_levels_char_minmax.py", line 107, in create_tree_portfolio
+    pool.map(_run_one, range(n_feats ** tree_depth))
+  File "/home/jl6134/.conda/envs/FIN580/lib/python3.11/multiprocessing/pool.py", line 367, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jl6134/.conda/envs/FIN580/lib/python3.11/multiprocessing/pool.py", line 774, in get
+    raise self._value
+  File "/home/jl6134/.conda/envs/FIN580/lib/python3.11/multiprocessing/pool.py", line 540, in _handle_tasks
+    put(task)
+  File "/home/jl6134/.conda/envs/FIN580/lib/python3.11/multiprocessing/connection.py", line 206, in send
+    self._send_bytes(_ForkingPickler.dumps(obj))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jl6134/.conda/envs/FIN580/lib/python3.11/multiprocessing/reduction.py", line 51, in dumps
+    cls(buf, protocol).dump(obj)
+AttributeError: Can't pickle local object 'create_tree_portfolio.<locals>._run_one'

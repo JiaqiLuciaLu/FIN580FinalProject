@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fin580-aptrees"
+version = "0.0.0"
+description = "AP-Trees replication (Bryzgalova, Pelger, Zhu 2020)."
+requires-python = ">=3.11"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+namespaces = true

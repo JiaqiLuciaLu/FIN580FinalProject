@@ -30,15 +30,17 @@ def load_rf():
     return df.iloc[:, 0].to_numpy(dtype=float)
 
 
-def load_filtered_tree_portfolios(subdir=utils.SUBDIR_3CHAR):
+def load_filtered_tree_portfolios(subdir=utils.SUBDIR_3CHAR, tree_port_dir=None):
     """
     Load `level_all_excess_combined_filtered.csv` -- base portfolios for AP pruning.
     Shape: (n_months=632, n_portfolios=~2200).
     Column names encode tree id + path; preserved as-is so we can parse depths.
+
+    `tree_port_dir` defaults to TREE_PORT_DIR (R ground truth). Pass
+    PY_TREE_PORT_DIR to read Phase F outputs.
     """
-    path = os.path.join(
-        utils.TREE_PORT_DIR, subdir, "level_all_excess_combined_filtered.csv"
-    )
+    base = tree_port_dir if tree_port_dir is not None else utils.TREE_PORT_DIR
+    path = os.path.join(base, subdir, "level_all_excess_combined_filtered.csv")
     df = pd.read_csv(path)
     return df
 
