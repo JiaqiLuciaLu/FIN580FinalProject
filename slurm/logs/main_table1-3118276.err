@@ -1,0 +1,21 @@
+Traceback (most recent call last):
+  File "/scratch/network/jl6134/COLLAB/FIN580/FIN580FinalProject/src/code/jobs/main_table1.py", line 238, in <module>
+    main()
+  File "/scratch/network/jl6134/COLLAB/FIN580/FIN580FinalProject/src/code/jobs/main_table1.py", line 196, in main
+    pickBestLambda(feats_list, feat1, feat2, ts64_grid_search_path, 64,
+  File "/scratch/network/jl6134/COLLAB/FIN580/FIN580FinalProject/src/code/metrics/pick_best_lambda.py", line 92, in pickBestLambda
+    weights = full_match.iloc[0, 3:]
+              ~~~~~~~~~~~~~~~^^^^^^^
+  File "/home/jl6134/.conda/envs/FIN580/lib/python3.11/site-packages/pandas/core/indexing.py", line 1200, in __getitem__
+    return self._getitem_tuple(key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jl6134/.conda/envs/FIN580/lib/python3.11/site-packages/pandas/core/indexing.py", line 1711, in _getitem_tuple
+    tup = self._validate_tuple_indexer(tup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jl6134/.conda/envs/FIN580/lib/python3.11/site-packages/pandas/core/indexing.py", line 993, in _validate_tuple_indexer
+    self._validate_key(k, i)
+  File "/home/jl6134/.conda/envs/FIN580/lib/python3.11/site-packages/pandas/core/indexing.py", line 1605, in _validate_key
+    self._validate_integer(key, axis)
+  File "/home/jl6134/.conda/envs/FIN580/lib/python3.11/site-packages/pandas/core/indexing.py", line 1706, in _validate_integer
+    raise IndexError("single positional indexer is out-of-bounds")
+IndexError: single positional indexer is out-of-bounds

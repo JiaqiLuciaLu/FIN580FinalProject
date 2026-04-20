@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/scratch/network/jl6134/COLLAB/FIN580/FIN580FinalProject/src/code/main.py", line 181, in <module>
+    main()
+  File "/scratch/network/jl6134/COLLAB/FIN580/FIN580FinalProject/src/code/main.py", line 161, in main
+    pickSRN(feats_list, feat1, feat2, tree_grid_search_path, 5, 50,
+  File "/scratch/network/jl6134/COLLAB/FIN580/FIN580FinalProject/src/code/metrics/sr_n.py", line 36, in pickSRN
+    col = pickBestLambda(
+          ^^^^^^^^^^^^^^^
+  File "/scratch/network/jl6134/COLLAB/FIN580/FIN580FinalProject/src/code/metrics/pick_best_lambda.py", line 73, in pickBestLambda
+    flat_argmax = int(np.nanargmax(valid_SR))
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jl6134/.conda/envs/FIN580/lib/python3.11/site-packages/numpy/lib/_nanfunctions_impl.py", line 624, in nanargmax
+    raise ValueError("All-NaN slice encountered")
+ValueError: All-NaN slice encountered

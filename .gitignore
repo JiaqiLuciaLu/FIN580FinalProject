@@ -3,3 +3,6 @@ __pycache__/
 *.pyo
 output/
 .ipynb_checkpoints/
+src/code/notebooks/scratch
+.claude/
+*.egg-info/

@@ -1,0 +1,29 @@
+=== Job 3118276 started: Mon Apr 20 12:42:06 AM EDT 2026 on adroit-h11n2 ===
+CPUs: 16   Mem/cpu: 4096M
+Working dir: /scratch/network/jl6134/COLLAB/FIN580/FIN580FinalProject
+[main_table1] workers=16, rebuild=False, subdir=LME_OP_Investment
+[main_table1] Step 1 skipped (chunks cached)
+[main_table1] Steps 2-4 skipped (tree cached)
+[main_table1] TS32 skipped (cached)
+[main_table1] TS64 skipped (cached)
+[main_table1] Portfolio stage: 0.0s
+[main_table1] lambda grid: 19 × 13 = 247 cells / CV fold
+LME_OP_Investment
+[main_table1] AP_Pruning tree: 49.9s
+LME_OP_Investment
+[main_table1] AP_Pruning ts32: 1.3s
+LME_OP_Investment
+[main_table1] AP_Pruning ts64: 2.4s
+4
+5
+4
+5
+4
+5
+4
+5
+4
+5
+4
+5
+=== Job 3118276 finished: Mon Apr 20 12:44:02 AM EDT 2026 ===

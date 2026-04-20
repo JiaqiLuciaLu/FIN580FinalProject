@@ -12,10 +12,8 @@ import matplotlib.colors as mcolors
 
 from src.code.utils import (
     PY_TREE_GRID_DIR, SUBDIR_3CHAR, KMIN, KMAX, OUTPUT_DIR,
-    DATA_RAW, TREE_GRID_DIR,
+    TREE_GRID_DIR, TREE_PORT_DIR,
 )
-
-TREE_PORT_DIR = os.path.join(DATA_RAW, "tree_portfolio_quantile")
 FEATS_3CHAR = ["LME", "OP", "Investment"]
 FEATS_NAMES = ["Size", "Prof", "Inv"]
 
