@@ -61,11 +61,15 @@ def main():
                     help="Parallel workers for AP_Pruning (default = SLURM_CPUS_PER_TASK or 8).")
     ap.add_argument("--rebuild", action="store_true",
                     help="Force rebuild of portfolio construction steps (default: skip if cached).")
+    ap.add_argument("--feat1", type=int, default=4,
+                    help="1-indexed feat1 position in FEATS_LIST (default 4 = OP).")
+    ap.add_argument("--feat2", type=int, default=5,
+                    help="1-indexed feat2 position in FEATS_LIST (default 5 = Investment).")
     args = ap.parse_args()
 
     feats_list = utils.FEATS_LIST
-    feat1 = 4   # Operating Prof
-    feat2 = 5   # Investment
+    feat1 = args.feat1
+    feat2 = args.feat2
     y_min = 1964
     y_max = 2016
     n_train_valid = 360
