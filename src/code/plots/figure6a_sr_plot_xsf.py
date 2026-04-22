@@ -64,11 +64,12 @@ def sr_plot_xsf(sr_summary_file, plot_path=None, p=10):
     plot_name = os.path.join(plot_path, f"SRwithXSF_{p}.png")
 
     # R plot order (legend order): AP-Tree, Triple Sort (32), Triple Sort (64), XSF.
+    # XSF series commented out — we don't have XSF SR data for our 36 cross-sections.
     series = [
         ("AP-Tree",          values["aptree"].to_numpy()),
         ("Triple Sort (32)", values["ts32"].to_numpy()),
         ("Triple Sort (64)", values["ts64"].to_numpy()),
-        ("XSF",              values["xsf"].to_numpy()),
+        # ("XSF",              values["xsf"].to_numpy()),
     ]
 
     ids = values["Id"].astype(str).tolist()

@@ -25,11 +25,12 @@
 #
 # Does NOT include XS R²_adj (small local computation; run separately).
 #
-# Runtime estimate:
-#   • AP_Pruning tree (full CV + 4 CV folds, 247 cells, parallel × 16 cpus)  ~45 min
-#   • AP_Pruning TS32 / TS64                                                  ~15 min each
-#   • pickBestLambda × 5, SDF_regression × 4, pickSRN                         ~10 min
-#   • TOTAL wall clock ~1.5 h (6 h limit is ample)
+# Runtime observed (smoke test 3124588, 4 cpus, fresh subdirs):
+#   • Steps 2-4 + TS32/TS64 (portfolio construction, cold)  ~30 min
+#   • AP_Pruning tree  (full CV, 247 cells × 4 folds)        ~2.5 min
+#   • AP_Pruning TS32 / TS64                                  ~3–7 s each
+#   • pickBestLambda × 5, SDF_regression × 4, pickSRN         ~5 min
+#   • TOTAL wall clock ~45 min (with cold portfolio stage); ~5 min if cached
 #
 # Submit:
 #   sbatch slurm/main_table1.sbatch

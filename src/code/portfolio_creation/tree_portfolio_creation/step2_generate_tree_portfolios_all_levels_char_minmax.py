@@ -47,6 +47,33 @@ def expand_grid(n_items, tree_depth):
     return result
 
 
+def _build_one_tree_permutation(k, feat_list_id_k, feats, data_path,
+                                tree_depth, q_num, y_min, y_max,
+                                cnames, main_dir, sub_dir):
+    """Module-level worker for `multiprocessing.Pool` (must be picklable)."""
+    file_id = "".join(str(x) for x in feat_list_id_k[k])
+    feat_list = [feats[idx - 1] for idx in feat_list_id_k[k]]
+    ret = tree_portfolio(data_path, feat_list, tree_depth, q_num,
+                         y_min, y_max, "y", feats)
+    ret_table = pd.DataFrame(ret[0], columns=[str(c) for c in cnames])
+    ret_table.to_csv(
+        os.path.join(main_dir, sub_dir, f"{file_id}ret.csv"), index=False
+    )
+
+    n_feats = len(feats)
+    for f in range(n_feats):
+        feat_min_table = pd.DataFrame(ret[2 * f + 1], columns=[str(c) for c in cnames])
+        feat_min_table.to_csv(
+            os.path.join(main_dir, sub_dir, f"{file_id}{feats[f]}_min.csv"),
+            index=False,
+        )
+        feat_max_table = pd.DataFrame(ret[2 * f + 2], columns=[str(c) for c in cnames])
+        feat_max_table.to_csv(
+            os.path.join(main_dir, sub_dir, f"{file_id}{feats[f]}_max.csv"),
+            index=False,
+        )
+
+
 def create_tree_portfolio(y_min=utils.Y_MIN, y_max=utils.Y_MAX, tree_depth=4,
                           feats_list=None, feat1=utils.FEAT1, feat2=utils.FEAT2,
                           input_path=utils.DATA_CHUNK_DIR,
@@ -76,36 +103,21 @@ def create_tree_portfolio(y_min=utils.Y_MIN, y_max=utils.Y_MAX, tree_depth=4,
 
     q_num = 2
 
-    feat_list_base = feats
     feat_list_id_k = expand_grid(n_feats, tree_depth)
-
-    def _run_one(k):
-        file_id = "".join(str(x) for x in feat_list_id_k[k])
-        feat_list = [feat_list_base[idx - 1] for idx in feat_list_id_k[k]]
-        ret = tree_portfolio(data_path, feat_list, tree_depth, q_num,
-                             y_min, y_max, "y", feats)
-        ret_table = pd.DataFrame(ret[0], columns=[str(c) for c in cnames])
-        ret_table.to_csv(
-            os.path.join(main_dir, sub_dir, f"{file_id}ret.csv"), index=False
-        )
-
-        for f in range(n_feats):
-            feat_min_table = pd.DataFrame(ret[2 * f + 1], columns=[str(c) for c in cnames])
-            feat_min_table.to_csv(
-                os.path.join(main_dir, sub_dir, f"{file_id}{feats[f]}_min.csv"),
-                index=False,
-            )
-            feat_max_table = pd.DataFrame(ret[2 * f + 2], columns=[str(c) for c in cnames])
-            feat_max_table.to_csv(
-                os.path.join(main_dir, sub_dir, f"{file_id}{feats[f]}_max.csv"),
-                index=False,
-            )
 
     if runparallel:
         from multiprocessing import Pool
+        args = [
+            (k, feat_list_id_k, feats, data_path, tree_depth, q_num,
+             y_min, y_max, cnames, main_dir, sub_dir)
+            for k in range(n_feats ** tree_depth)
+        ]
         with Pool(paralleln) as pool:
-            pool.map(_run_one, range(n_feats ** tree_depth))
+            pool.starmap(_build_one_tree_permutation, args)
     else:
         for k in range(n_feats ** tree_depth):
             print(k + 1)
-            _run_one(k)
+            _build_one_tree_permutation(
+                k, feat_list_id_k, feats, data_path, tree_depth, q_num,
+                y_min, y_max, cnames, main_dir, sub_dir,
+            )

@@ -6,3 +6,5 @@ output/
 src/code/notebooks/scratch
 .claude/
 *.egg-info/
+*.err
+*.out

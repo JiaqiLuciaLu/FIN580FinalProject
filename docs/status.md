@@ -21,10 +21,27 @@ All single-cross-section plots now unblocked after the full-grid run
   — assembles paper Table 1 (AP10 / AP40 / TS32 / TS64) into
     `data/processed/tables/paper_table1.csv`.
 
+### Iteration 2026-04-21: full-grid pipeline across all 36 cross-sections
+Added `--feat1/--feat2` CLI args to `src/code/jobs/main_table1.py` and a
+SLURM array sbatch `slurm/main_fig6.sbatch` (`--array=0-35`, 4 cpus, 640M/cpu,
+1h 45m limit) that maps each array index to one `(feat1, feat2)` pair via
+`itertools.combinations(range(2,11), 2)`. Fixed a `multiprocessing.Pool`
+pickling crash in `step2_generate_tree_portfolios_all_levels_char_minmax.py`
+by promoting the per-permutation worker from a closure to a module-level
+function, and added a reusable validator `src/notebooks/scratch/validation.py`
+that checks file presence, NaN counts, and test-period SR(K=10/40) per subdir.
+All 36 cross-sections ran via jobs 3124588 (0-2), 3124821 (3-19), 3125017
+(20-35); 35/36 PASS with sensible Sharpe ratios (reference `LME_OP_Investment`
+matches paper at 0.64/0.67). The one failure (`LME_r12_2_IdioVol`) hits a
+documented TS32 edge case where LARS-EN can't reach K=32 at any grid cell, so
+`pickBestLambda` returns NaN, `Selected_Ports_32.csv` is never written, and
+the subsequent `SDF_regression` aborts with `FileNotFoundError`.
+
 ### Still blocked
 - **Figure 6a** (`src/code/plots/figure6a_sr_plot_xsf.py`) — needs
-  36-cross-section `SR_Summary.csv`. Job B (all 36 cross-sections) not yet
-  run.
+  `SR_Summary.csv` assembled from the 35 passing subdirs (36 if
+  `LME_r12_2_IdioVol` is repaired via a file-exists guard in
+  `main_table1.py` + rerun of `--array=13`).
 
 ## Pipeline validation
 
