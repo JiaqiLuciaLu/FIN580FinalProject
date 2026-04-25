@@ -13,12 +13,49 @@ import pandas as pd
 from src.code import utils
 
 
+def loadLambdaGrid(ap_prune_result_path, subdir, lambda0, lambda2, fullCV=False):
+    """Load every results_{full,cv_*}_l0_{i}_l2_{j}.csv on the (lambda0,
+    lambda2) grid into memory once, so callers that sweep K (e.g.
+    `pickSRN`) don't re-read the same files for every K.
+
+    Returns
+    -------
+    dict mapping (i, j) -> {"full": df, "cv3": df, ["cv1": df, "cv2": df]}.
+    """
+    lambda0 = np.asarray(lambda0).ravel()
+    lambda2 = np.asarray(lambda2).ravel()
+    cache = {}
+    for i in range(len(lambda0)):
+        for j in range(len(lambda2)):
+            entry = {
+                "full": pd.read_csv(
+                    os.path.join(ap_prune_result_path, subdir,
+                                 f"results_full_l0_{i + 1}_l2_{j + 1}.csv")
+                ),
+                "cv3": pd.read_csv(
+                    os.path.join(ap_prune_result_path, subdir,
+                                 f"results_cv_3_l0_{i + 1}_l2_{j + 1}.csv")
+                ),
+            }
+            if fullCV:
+                entry["cv1"] = pd.read_csv(
+                    os.path.join(ap_prune_result_path, subdir,
+                                 f"results_cv_1_l0_{i + 1}_l2_{j + 1}.csv")
+                )
+                entry["cv2"] = pd.read_csv(
+                    os.path.join(ap_prune_result_path, subdir,
+                                 f"results_cv_2_l0_{i + 1}_l2_{j + 1}.csv")
+                )
+            cache[(i, j)] = entry
+    return cache
+
+
 def pickBestLambda(feats_list=None, feat1=utils.FEAT1, feat2=utils.FEAT2,
                    ap_prune_result_path=utils.PY_TREE_GRID_DIR, portN=10,
                    lambda0=None, lambda2=None,
                    portfolio_path=utils.PY_TREE_PORT_DIR,
                    port_name="level_all_excess_combined_filtered.csv",
-                   fullCV=False, writetable=True):
+                   fullCV=False, writetable=True, grid_cache=None):
     if feats_list is None:
         feats_list = utils.FEATS_LIST
     print(feat1)
@@ -36,14 +73,19 @@ def pickBestLambda(feats_list=None, feat1=utils.FEAT1, feat2=utils.FEAT2,
 
     for i in range(len(lambda0)):
         for j in range(len(lambda2)):
-            full_data = pd.read_csv(
-                os.path.join(ap_prune_result_path, subdir,
-                             f"results_full_l0_{i + 1}_l2_{j + 1}.csv")
-            )
-            cv_data = pd.read_csv(
-                os.path.join(ap_prune_result_path, subdir,
-                             f"results_cv_3_l0_{i + 1}_l2_{j + 1}.csv")
-            )
+            if grid_cache is not None:
+                entry = grid_cache[(i, j)]
+                full_data = entry["full"]
+                cv_data = entry["cv3"]
+            else:
+                full_data = pd.read_csv(
+                    os.path.join(ap_prune_result_path, subdir,
+                                 f"results_full_l0_{i + 1}_l2_{j + 1}.csv")
+                )
+                cv_data = pd.read_csv(
+                    os.path.join(ap_prune_result_path, subdir,
+                                 f"results_cv_3_l0_{i + 1}_l2_{j + 1}.csv")
+                )
 
             # R: full_data has cols [train_SR, test_SR, portsN, betas...]
             #    cv_data   has cols [train_SR, valid_SR, test_SR, portsN, betas...]
@@ -62,16 +104,20 @@ def pickBestLambda(feats_list=None, feat1=utils.FEAT1, feat2=utils.FEAT2,
             test_SR[i, j] = full_match.iloc[0, 1] if len(full_match) > 0 else np.nan
 
             if fullCV:
-                cv1 = pd.read_csv(
-                    os.path.join(ap_prune_result_path, subdir,
-                                 f"results_cv_1_l0_{i + 1}_l2_{j + 1}.csv")
-                )
+                if grid_cache is not None:
+                    cv1 = grid_cache[(i, j)]["cv1"]
+                    cv2 = grid_cache[(i, j)]["cv2"]
+                else:
+                    cv1 = pd.read_csv(
+                        os.path.join(ap_prune_result_path, subdir,
+                                     f"results_cv_1_l0_{i + 1}_l2_{j + 1}.csv")
+                    )
+                    cv2 = pd.read_csv(
+                        os.path.join(ap_prune_result_path, subdir,
+                                     f"results_cv_2_l0_{i + 1}_l2_{j + 1}.csv")
+                    )
                 cv1_match = cv1[cv1["portsN"] == portN]
                 valid_SR[i, j] += cv1_match.iloc[0, 1] if len(cv1_match) > 0 else np.nan
-                cv2 = pd.read_csv(
-                    os.path.join(ap_prune_result_path, subdir,
-                                 f"results_cv_2_l0_{i + 1}_l2_{j + 1}.csv")
-                )
                 cv2_match = cv2[cv2["portsN"] == portN]
                 valid_SR[i, j] += cv2_match.iloc[0, 1] if len(cv2_match) > 0 else np.nan
                 valid_SR[i, j] /= 3.0

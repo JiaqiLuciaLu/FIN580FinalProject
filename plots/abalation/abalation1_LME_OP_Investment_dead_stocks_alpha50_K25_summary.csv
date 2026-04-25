@@ -1,0 +1,6 @@
+scope,n_leaves,mean_dead,mean_alive,mean_dead_pct,median_dead,p10,p90,min_dead,max_dead
+all 81 perms × 16 leaves,1296,3229.7,781.8,80.5,3225.8,3025.8,3435.5,2680.7,3544.8
+post-step4 universe (78 perms × 16),1248,3241.7,769.8,80.8,3230.5,3041.2,3437.0,2864.9,3544.8
+monoculture (filtered out by step 4),48,2916.9,1094.6,72.7,2851.7,2772.4,3309.8,2680.7,3384.7
+depth-4 leaves used by K=25 SDF,18,3314.7,696.8,82.6,3393.3,3123.3,3444.9,3099.9,3450.3
+"non-monoculture, NOT used by K=25",1230,3240.7,770.8,80.8,3229.4,3040.9,3436.1,2864.9,3544.8

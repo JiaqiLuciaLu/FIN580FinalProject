@@ -1,0 +1,17 @@
+portfolio_id,baseline_EN_weight,baseline_ann_mean(%),baseline_ann_std(%),baseline_ann_SR,fuzzy_a50_EN_weight,fuzzy_a50_ann_mean(%),fuzzy_a50_ann_std(%),fuzzy_a50_ann_SR,decoded
+3111.11111,0.7637127381093505,25.38,27.99,0.907,2.301553024601837,23.26,27.26,0.853,d=4 | Investment=lo > LME=lo > LME=lo > LME=lo
+1111.121,,,,,1.4903738624681988,8.84,19.24,0.459,d=2 | LME=hi > LME=lo
+3313.12212,,,,,-1.2409328323106088,0.38,26.09,0.015,d=4 | Investment=hi > Investment=hi > LME=lo > Investment=hi
+1221.1111,-0.4889753761842886,4.96,26.18,0.19,-1.1592663738403628,5.21,25.93,0.201,d=3 | LME=lo > OP=lo > OP=lo
+2122.11111,-0.5032852411449288,4.64,30.06,0.154,-0.7844237034819272,4.69,29.42,0.159,d=4 | OP=lo > LME=lo > OP=lo > OP=lo
+1211.11111,0.6678492440270951,21.87,28.93,0.756,,,,,d=4 | LME=lo > OP=lo > LME=lo > LME=lo
+3211.112,0.6625632640848425,7.72,13.88,0.556,0.2648307219348615,7.66,13.87,0.552,d=2 | Investment=lo > OP=hi
+1333.11222,-0.4291334319057904,0.24,25.77,0.009,,,,,d=4 | LME=lo > Investment=hi > Investment=hi > Investment=hi
+2331.1211,0.326430966097275,8.94,14.86,0.602,,,,,d=3 | OP=hi > Investment=lo > Investment=lo
+2211.122,,,,,0.1544910810395415,7.29,15.32,0.475,d=2 | OP=hi > OP=hi
+2221.11111,,,,,-0.1489481882105283,5.74,29.25,0.196,d=4 | OP=lo > OP=lo > OP=lo > LME=lo
+3212.12111,-0.099235225782372,1.44,23.37,0.062,,,,,d=4 | Investment=hi > OP=lo > LME=lo > OP=lo
+1331.12121,0.088184407683856,10.46,17.13,0.611,,,,,d=4 | LME=hi > Investment=lo > Investment=hi > LME=lo
+3211.1121,,,,,0.0614599310085243,12.56,19.7,0.638,d=3 | Investment=lo > OP=hi > LME=lo
+1311.1211,,,,,0.0608624767904636,10.56,18.33,0.576,d=3 | LME=hi > Investment=lo > LME=lo
+2231.1221,0.0118886550149603,8.47,14.51,0.584,,,,,d=3 | OP=hi > OP=hi > Investment=lo
