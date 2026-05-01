@@ -7,6 +7,8 @@ pruned by an elastic-net SDF. We port the authors' R pipeline to Python,
 replicate the headline tables/figures, and run an ablation that swaps the hard
 median split for a soft (sigmoid) split.
 
+**Disclaimer:** We used Claude to generate/implement the project code base.
+
 ## Code structure
 
 ```
